@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>ARROW</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#00497D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ARROW">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── Operator setup ─────────────────────────────────────────────────── -->
+<section id="screen-setup" class="screen">
+  <div class="pad">
+    <h1 class="brand">ARROW</h1>
+    <p class="sub" data-i18n="app_tagline">Asset Registry and Reporting of Right Of Way</p>
+    <label class="field">
+      <span data-i18n="setup_name">Your name</span>
+      <input id="setup-name" type="text" autocomplete="name" autocapitalize="words"
+             data-i18n-placeholder="setup_placeholder" placeholder="e.g. Billy">
+    </label>
+    <p class="hint" data-i18n="setup_hint">Recorded against every asset and used in the Excel filename.</p>
+    <div class="lang" id="lang-setup"></div>
+    <button id="setup-save" class="primary" disabled data-i18n="setup_start">Start</button>
+  </div>
+</section>
+
+<!-- ── Capture form ───────────────────────────────────────────────────── -->
+<section id="screen-form" class="screen">
+  <header class="bar">
+    <span id="operator-label" class="who"></span>
+    <!-- The language switch sits in the header row rather than taking a row of
+         its own, the same place the Android app puts it. -->
+    <div class="lang" id="lang-form"></div>
+    <button id="change-operator" class="link" data-i18n="change">Change</button>
+  </header>
+
+  <div class="pad">
+    <div class="row-between counter">
+      <span id="today-count">No assets recorded today</span>
+      <button id="view-list" class="link" data-i18n="view">View</button>
+    </div>
+
+    <!-- GPS. Capture is impossible without a fix, exactly as on Android. -->
+    <div id="gps" class="gps waiting">
+      <div class="gps-line" id="gps-status">Waiting for GPS…</div>
+      <div class="gps-line small" id="gps-detail"></div>
+    </div>
+
+    <!-- Only the labels are translated. The options themselves stay English in
+         both languages — they are stored, exported and reported verbatim. -->
+    <label class="field">
+      <span data-i18n="label_zone">Zone</span>
+      <select id="f-zone"></select>
+    </label>
+
+    <label class="field">
+      <span data-i18n="label_segment">Segment</span>
+      <select id="f-segment"></select>
+    </label>
+
+    <label class="field">
+      <span data-i18n="label_asset_type">Asset Type</span>
+      <select id="f-type"></select>
+    </label>
+
+    <div class="field">
+      <span data-i18n="label_condition">Condition</span>
+      <div id="f-condition" class="chips"></div>
+    </div>
+
+    <label class="field">
+      <span data-i18n="label_kp">KP</span>
+      <input id="f-kp" type="text" inputmode="numeric" pattern="[0-9+]*"
+             placeholder="12+500" maxlength="6" enterkeyhint="done">
+    </label>
+
+    <label class="field">
+      <span data-i18n="label_note">Note (optional)</span>
+      <textarea id="f-note" rows="2"></textarea>
+    </label>
+
+    <button id="take-photo" class="primary" disabled data-i18n="take_photo">Take Photo</button>
+    <!-- The native iPhone camera. Far more reliable inside a home-screen web
+         app than getUserMedia, and it gives the full-quality capture. -->
+    <input id="camera-input" type="file" accept="image/*" capture="environment" hidden>
+
+    <button id="go-export" class="secondary" data-i18n="go_export">Export Excel &amp; Send</button>
+  </div>
+</section>
+
+<!-- ── Review ─────────────────────────────────────────────────────────── -->
+<section id="screen-review" class="screen">
+  <header class="bar">
+    <span class="who" data-i18n="review_title">Review</span>
+  </header>
+  <div class="pad">
+    <img id="review-photo" class="review-photo" alt="">
+    <dl id="review-summary" class="summary"></dl>
+    <button id="review-save" class="primary" data-i18n="review_save">Save Asset</button>
+    <button id="review-retake" class="secondary" data-i18n="review_retake">Retake Photo</button>
+    <button id="review-discard" class="danger-link" data-i18n="review_discard">Discard</button>
+  </div>
+</section>
+
+<!-- ── Today's records ────────────────────────────────────────────────── -->
+<section id="screen-list" class="screen">
+  <header class="bar">
+    <button id="list-back" class="link" data-i18n="back">Back</button>
+    <span class="who" id="list-title"></span>
+  </header>
+  <div class="pad">
+    <div id="list-body" class="list"></div>
+  </div>
+</section>
+
+<!-- ── Export ─────────────────────────────────────────────────────────── -->
+<section id="screen-export" class="screen">
+  <header class="bar">
+    <button id="export-back" class="link" data-i18n="back">Back</button>
+    <span class="who" data-i18n="export_title">Export</span>
+  </header>
+  <div class="pad">
+    <p id="export-summary" class="lead"></p>
+    <!-- Sent records stay on the phone but are left out of the next file, so
+         a second send doesn't repeat the first. This puts them back in. -->
+    <button id="export-include" class="link hidden"></button>
+    <div id="export-address" class="notice hidden"></div>
+
+    <button id="export-build" class="primary" data-i18n="build_file">Build Excel File</button>
+
+    <!-- Sharing must be its own tap. iOS drops permission to open the share
+         sheet if the button's handler awaits anything first, so the file is
+         built on one tap and handed over on the next. -->
+    <div id="export-ready" class="hidden">
+      <p id="export-filename" class="filename"></p>
+      <button id="export-share" class="primary" data-i18n="send_whatsapp">Send to WhatsApp</button>
+      <button id="export-download" class="secondary" data-i18n="save_to_files">Save to Files</button>
+      <button id="export-clear" class="danger-link" data-i18n="clear_sent">Clear sent records</button>
+    </div>
+
+    <p id="export-status" class="status"></p>
+  </div>
+</section>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/legacy.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/db.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/photo.js"></script>
+<script src="js/xlsx.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

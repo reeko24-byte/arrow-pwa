@@ -1,0 +1,285 @@
+/* ARROW PWA — built for a phone held at arm's length in direct sun.
+   Light, high contrast, large targets. No dark theme: the screen competes
+   with sunlight, and a dark surface loses that fight. */
+
+:root {
+  --blue:        #00497D;   /* Pertamina blue — app bar */
+  --blue-bright: #0066B3;   /* accent, primary action */
+  --teal:        #2E7C9E;   /* Bina Rekayasa Anugrah, supporting */
+  --ink:         #16202A;
+  --ink-soft:    #5A6672;
+  --line:        #C9D2DA;
+  --surface:     #FFFFFF;
+  --page:        #EFF3F6;
+  --amber:       #8A5A00;
+  --amber-bg:    #FFF3D6;
+  --green:       #1B6B3A;
+  --green-bg:    #E3F3E9;
+  --red:         #A32020;
+  --tap:         52px;      /* nothing interactive is smaller */
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Stops iOS scaling text up in landscape and breaking the layout. */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── Screens ─────────────────────────────────────────────────────────── */
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+.pad {
+  padding: 16px;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--blue);
+  color: #fff;
+  padding: 10px 12px;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.bar .who { font-weight: 600; flex: 1; }
+.bar .link { color: #fff; }
+
+.brand {
+  margin: 24px 0 4px;
+  font-size: 34px;
+  letter-spacing: 3px;
+  color: var(--blue);
+}
+.sub { margin: 0 0 28px; color: var(--ink-soft); font-size: 14px; }
+.lead { font-size: 18px; margin: 4px 0 20px; }
+
+/* ── Fields ──────────────────────────────────────────────────────────── */
+
+.field { display: block; margin-bottom: 14px; }
+.field > span {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.field > span em { font-style: normal; font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+input[type=text], select, textarea {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  /* 17px minimum, or iOS zooms the whole page in when the field is focused. */
+  font-size: 17px;
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A6672' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--blue-bright);
+  box-shadow: 0 0 0 3px rgba(0, 102, 179, 0.18);
+}
+textarea { min-height: 64px; resize: vertical; }
+
+#f-kp { font-variant-numeric: tabular-nums; letter-spacing: 2px; font-size: 20px; }
+
+/* ── Language switch ─────────────────────────────────────────────────── */
+
+.lang { display: flex; align-items: center; gap: 2px; }
+.lang button {
+  color: #fff;
+  opacity: 0.6;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 10px;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+}
+.lang button[aria-pressed="true"] { opacity: 1; text-decoration: underline; }
+
+/* On the setup screen it sits on the page rather than the blue bar. */
+#lang-setup { justify-content: center; margin-bottom: 4px; }
+#lang-setup button { color: var(--ink-soft); }
+#lang-setup button[aria-pressed="true"] { color: var(--blue-bright); }
+
+/* ── Condition chips ─────────────────────────────────────────────────── */
+
+.chips { display: flex; gap: 8px; }
+.chip {
+  flex: 1;
+  min-height: var(--tap);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 16px;
+  font-family: inherit;
+}
+.chip[aria-pressed="true"] {
+  background: var(--blue-bright);
+  border-color: var(--blue-bright);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+.primary, .secondary {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 12px;
+  padding: 14px;
+}
+.primary { background: var(--blue-bright); color: #fff; }
+.primary:disabled { background: #B7C3CD; color: #F2F5F7; }
+.secondary { background: var(--surface); color: var(--blue); border: 1.5px solid var(--line); }
+.secondary:disabled { color: #9BA6B0; }
+.link { color: var(--blue-bright); font-size: 16px; padding: 8px; font-weight: 500; }
+.danger-link {
+  display: block;
+  width: 100%;
+  color: var(--red);
+  font-size: 15px;
+  padding: 14px;
+  margin-top: 4px;
+}
+
+/* ── GPS panel ───────────────────────────────────────────────────────── */
+
+.gps {
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border: 1.5px solid transparent;
+}
+.gps.waiting { background: var(--amber-bg); border-color: #E5C77A; color: var(--amber); }
+.gps.ok      { background: var(--green-bg); border-color: #A8D5BA; color: var(--green); }
+.gps.denied  { background: #FBE6E6; border-color: #E2A2A2; color: var(--red); }
+.gps-line { font-weight: 600; font-size: 15px; }
+.gps-line.small { font-weight: 400; font-size: 13px; font-variant-numeric: tabular-nums; opacity: 0.9; }
+
+/* ── Counter row ─────────────────────────────────────────────────────── */
+
+.row-between { display: flex; align-items: center; gap: 8px; }
+.counter { margin-bottom: 12px; }
+.counter span { flex: 1; font-size: 15px; color: var(--ink-soft); }
+
+/* ── Review ──────────────────────────────────────────────────────────── */
+
+.review-photo {
+  width: 100%;
+  border-radius: 10px;
+  background: #000;
+  display: block;
+}
+.summary {
+  margin: 16px 0 8px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  font-size: 15px;
+}
+.summary dt { color: var(--ink-soft); }
+.summary dd { margin: 0; font-weight: 600; }
+
+/* ── List ────────────────────────────────────────────────────────────── */
+
+.list { display: flex; flex-direction: column; gap: 10px; }
+.card {
+  display: flex;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  align-items: center;
+}
+.card img { width: 68px; height: 68px; object-fit: cover; border-radius: 6px; background: #DDE4EA; }
+.card-body { flex: 1; min-width: 0; font-size: 14px; }
+.card-body b { display: block; font-size: 15px; }
+.card-body .meta { color: var(--ink-soft); }
+.card-body .addr { color: var(--ink-soft); font-size: 12px; }
+.card .danger-link { width: auto; padding: 10px; }
+.empty { color: var(--ink-soft); text-align: center; padding: 40px 0; }
+
+/* ── Notices / status ────────────────────────────────────────────────── */
+
+.notice {
+  background: var(--amber-bg);
+  border: 1.5px solid #E5C77A;
+  color: var(--amber);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.status { font-size: 14px; color: var(--ink-soft); margin-top: 14px; min-height: 20px; }
+.filename {
+  font-size: 13px;
+  color: var(--ink-soft);
+  word-break: break-all;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 18px 0 0;
+}
+.hint { font-size: 13px; color: var(--ink-soft); margin: -6px 0 18px; }
+.hidden { display: none; }
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translate(-50%, 20px);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 22px;
+  font-size: 15px;
+  max-width: 90%;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
