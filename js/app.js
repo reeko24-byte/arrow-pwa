@@ -648,6 +648,30 @@
   }
 
   /**
+   * Shows which version this phone is actually running.
+   *
+   * Read from the name of the live cache rather than a constant in the page,
+   * because a constant would be served from that same stale cache and cheerfully
+   * report the new version while running the old one. The cache name is the one
+   * thing that cannot lie about itself.
+   *
+   * "not cached" means no service worker has taken over yet — a first visit, or
+   * a browser that refused to register one. The app still works; it just will
+   * not open without a signal.
+   */
+  function showVersion() {
+    var line = $('app-version');
+    if (!window.caches || !caches.keys) { line.textContent = ''; return; }
+    caches.keys().then(function (names) {
+      var mine = names.filter(function (name) { return name.indexOf('arrow-') === 0; });
+      var controlled = navigator.serviceWorker && navigator.serviceWorker.controller;
+      line.textContent = mine.length
+        ? mine.sort().join(', ') + (controlled ? '' : ' · reload to apply')
+        : 'not cached';
+    }).catch(function () { line.textContent = ''; });
+  }
+
+  /**
    * The handful of facts that decide whether sharing and saving can work here.
    *
    * Shown only after a failure. Downloads from a home-screen web app need
@@ -760,9 +784,24 @@
       });
     });
 
+    showVersion();
+
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(function () {
+      navigator.serviceWorker.register('sw.js').then(function (registration) {
+        // Ask every launch. iOS only checks for a new worker on a real
+        // navigation, and resuming a home-screen app from the app switcher is
+        // not one — without this an update can sit unnoticed for days.
+        registration.update();
+        // The new worker calls skipWaiting, so it takes over as soon as it has
+        // installed. Redraw the marker then, rather than leaving the old
+        // version on screen until something else happens to repaint.
+        if (navigator.serviceWorker.addEventListener) {
+          navigator.serviceWorker.addEventListener('controllerchange', showVersion);
+        }
+        setTimeout(showVersion, 1500);
+      }).catch(function () {
         // Offline start-up won't work, but everything else still does.
+        showVersion();
       });
     }
   }

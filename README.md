@@ -65,9 +65,38 @@ gives you a permanent address.
 5. Wait a minute or two, then open
    `https://<your-username>.github.io/arrow-pwa/`
 
-To push an update later, replace the changed files and **bump `CACHE_VERSION`
-at the top of `sw.js`** (`arrow-v1` → `arrow-v2`). Without that bump the phones
-keep serving the copy they already cached and your change never appears.
+### Pushing an update
+
+1. Upload the changed files, replacing the old ones.
+2. **Bump `CACHE_VERSION`** — line 7 of `sw.js`, e.g. `arrow-v4` → `arrow-v5`.
+   Without a bump the phones keep serving the copy they already cached and the
+   change never appears.
+3. Wait for Pages to rebuild. **Settings → Pages** shows *"Your site is live
+   at…"* with the time of the last deploy; the **Actions** tab shows a green
+   tick when it has finished. Until then the old files are still being served.
+
+The bottom of the main screen shows which version that phone is running —
+`arrow-v4`, or `not cached` if no service worker has taken over. It is read
+from the live cache, not from a constant, so it cannot claim to be newer than
+it is. Ask an operator to read that line before debugging anything else.
+
+Two entries (`arrow-v3, arrow-v4`) means an update is installing and the next
+launch will complete it.
+
+### If a phone will not take the update
+
+iOS only checks for a new service worker on a real navigation, and resuming a
+home-screen app from the app switcher is not one. The app now calls
+`registration.update()` on every launch, but a phone already stuck on an old
+version has to be pushed once, in this order:
+
+1. Close the app **completely** — app switcher, swipe it up. Not just Home.
+2. Reopen it. Check the version line at the bottom.
+3. Still old? Open the same URL in **Safari** and pull down to reload. That is a
+   real navigation, so the new worker is fetched.
+4. Last resort: delete the home-screen icon, reopen the URL in Safari, and Add
+   to Home Screen again. Recorded assets survive this — they live in the
+   database, not the cache — but **export anything unsent first**, just in case.
 
 ### Installing on an iPhone
 

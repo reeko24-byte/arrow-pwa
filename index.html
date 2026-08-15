@@ -92,6 +92,10 @@
     <input id="camera-input" type="file" accept="image/*" capture="environment" hidden>
 
     <button id="go-export" class="secondary" data-i18n="go_export">Export Excel &amp; Send</button>
+
+    <!-- Which version this phone is actually running. Read from the live cache
+         rather than a constant, so it cannot claim to be newer than it is. -->
+    <p id="app-version" class="version"></p>
   </div>
 </section>
 

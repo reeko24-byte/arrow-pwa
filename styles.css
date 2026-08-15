@@ -263,6 +263,17 @@ button {
 .hint { font-size: 13px; color: var(--ink-soft); margin: -6px 0 18px; }
 .hidden { display: none; }
 
+/* ── Version marker ──────────────────────────────────────────────────── */
+
+.version {
+  font-size: 11px;
+  color: var(--ink-soft);
+  opacity: 0.75;
+  text-align: center;
+  margin: 28px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Toast ───────────────────────────────────────────────────────────── */
 
 .toast {
