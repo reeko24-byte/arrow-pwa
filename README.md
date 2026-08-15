@@ -35,6 +35,19 @@ tools keep matching: `North` → `North Zone`, `7` → `Segment 7`,
 Latitude and Longitude are written as **numbers** to seven decimals, so they
 sort and calculate rather than sitting as text.
 
+The file is named for when it was built and who built it, following the same
+convention as the Android export:
+
+```
+ARROW_Assets_20260815_142530_Billy.xlsx
+             └ date ┘└ time ┘└operator┘
+```
+
+The **time** is not decoration. Sending twice in a day is normal, and with only
+the date both files carry the same name — two identical-looking attachments in
+the group, and the second silently overwriting the first when the office saves
+them into one folder.
+
 ---
 
 ## Publishing it to GitHub Pages
@@ -141,8 +154,23 @@ Sharing is deliberately a second tap. iOS withdraws a page's permission to open
 the share sheet if the button waits on anything first, so the file is built on
 one tap and handed over on the next.
 
-If sharing is refused, **Save to Files** puts the workbook on the phone and you
-can attach it in WhatsApp yourself.
+The share passes **the file and nothing else** — no title, no text. Adding
+either alongside a file is a documented way to make Safari reject the share, and
+the filename already travels with the file, so the title bought nothing.
+
+### If "Send to WhatsApp" fails
+
+The message now names what iOS reported, and a line underneath shows whether the
+app is running from the home screen or a Safari tab, the iOS version, and
+whether sharing is supported at all. Report those two lines — they are the whole
+diagnosis.
+
+**Save to Files** is the fallback. If *that* also does nothing, the cause is
+almost certainly iOS: saving a file from a home-screen web app needs **iOS 16.4
+or newer**, and below that the tap fails silently with no error to catch. The
+way round it is to open the same URL in **Safari itself** rather than from the
+home-screen icon — downloads work normally there — then attach the file in
+WhatsApp by hand.
 
 ---
 

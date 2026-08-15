@@ -120,6 +120,8 @@
       st_sent: 'Sent. Those %1$d are marked as gone, so the next file will only ' +
                'carry what you record from here.',
       st_share_failed: 'Sharing failed. Use "Save to Files" and attach it in WhatsApp.',
+      st_share_failed_detail: 'Sharing failed — %1$s. Use "Save to Files" below, ' +
+                             'then attach the file in WhatsApp.',
       st_share_unsupported: 'This browser cannot share files directly. Use ' +
                             '"Save to Files", then attach it in WhatsApp.',
       st_downloaded: 'Saved to Files, and marked as sent.',
@@ -227,6 +229,8 @@
                'berikutnya hanya memuat yang Anda rekam mulai sekarang.',
       st_share_failed: 'Gagal membagikan. Gunakan "Simpan ke Files" lalu ' +
                        'lampirkan di WhatsApp.',
+      st_share_failed_detail: 'Gagal membagikan — %1$s. Gunakan "Simpan ke ' +
+                             'Files" di bawah, lalu lampirkan berkasnya di WhatsApp.',
       st_share_unsupported: 'Peramban ini tidak dapat membagikan berkas ' +
                             'langsung. Gunakan "Simpan ke Files", lalu ' +
                             'lampirkan di WhatsApp.',

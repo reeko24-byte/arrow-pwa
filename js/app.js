@@ -572,8 +572,14 @@
       return ARROW.xlsx.build(records, function (done, total) {
         status.textContent = t('st_photos', done, total);
       }).then(function (blob) {
-        var latest = records[records.length - 1];
-        var filename = 'ARROW_Assets_' + latest.date.replace(/-/g, '') + '_' +
+        /* Date AND time, the same convention as the Android export.
+           Sending twice in a day is normal, and with only the date both files
+           are called the same thing — two identical-looking attachments in the
+           group, and the second one silently overwriting the first when the
+           office saves them to a folder.
+           Stamped at build time, so one operator cannot produce two files with
+           the same name unless they export twice within a second. */
+        var filename = 'ARROW_Assets_' + ARROW.stampOf(new Date()) + '_' +
           ARROW.fileSafe(state.operator) + '.xlsx';
         state.built = {
           blob: blob, filename: filename,
@@ -604,7 +610,15 @@
     });
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: state.built.filename })
+      /* Files and nothing else. Passing `title` or `text` alongside `files` is
+         a documented way to make Safari reject the share outright, and the
+         filename is already carried by the File itself — so the title added
+         nothing and cost the whole share.
+
+         There is no retrying this: a second share() would run after a rejected
+         promise, outside the tap that authorised it, and fail on activation
+         instead of on whatever the real problem was. */
+      navigator.share({ files: [file] })
         .then(function () {
           var count = state.built.count;
           return markSent().then(function () {
@@ -614,12 +628,47 @@
         .catch(function (error) {
           // A cancelled share must not mark anything: nothing left the phone.
           if (error && error.name === 'AbortError') return;
-          $('export-status').textContent = t('st_share_failed');
+          // Say what iOS actually reported. Without it the fallback advice is
+          // all an operator can relay, and the cause stays invisible.
+          $('export-status').textContent =
+            t('st_share_failed_detail', describe(error));
+          showEnvironment();
         });
     } else {
       $('export-status').textContent = t('st_share_unsupported');
+      showEnvironment();
     }
   });
+
+  /** A short, reportable description of a failure. */
+  function describe(error) {
+    if (!error) return 'unknown';
+    var name = error.name || 'Error';
+    return error.message ? name + ': ' + error.message : name;
+  }
+
+  /**
+   * The handful of facts that decide whether sharing and saving can work here.
+   *
+   * Shown only after a failure. Downloads from a home-screen web app need
+   * iOS 16.4 or newer, so "standalone" plus an older version is the whole
+   * explanation, and it is not something an operator would think to mention.
+   */
+  function showEnvironment() {
+    var standalone = window.matchMedia('(display-mode: standalone)').matches ||
+      navigator.standalone === true;
+    var version = (navigator.userAgent.match(/OS (\d+)[_.](\d+)/) || [])
+      .slice(1, 3).join('.');
+    var facts = [
+      standalone ? 'home screen' : 'Safari tab',
+      version ? 'iOS ' + version : navigator.platform,
+      'share ' + (navigator.share ? 'yes' : 'no'),
+      'canShare ' + (navigator.canShare ? 'yes' : 'no')
+    ];
+    var line = $('export-env');
+    line.textContent = facts.join(' · ');
+    line.classList.remove('hidden');
+  }
 
   /** Stamps the batch that was just handed over. */
   function markSent() {
@@ -639,6 +688,10 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
     markSent().then(function () {
       $('export-status').textContent = t('st_downloaded');
+      // Saving from a home-screen web app needs iOS 16.4+; below that the tap
+      // does nothing at all and there is no error to catch. Say what to do
+      // instead, rather than leaving the operator tapping a dead button.
+      showEnvironment();
     });
   });
 
