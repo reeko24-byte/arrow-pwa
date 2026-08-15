@@ -679,18 +679,32 @@
    * explanation, and it is not something an operator would think to mention.
    */
   function showEnvironment() {
+    var agent = navigator.userAgent;
     var standalone = window.matchMedia('(display-mode: standalone)').matches ||
       navigator.standalone === true;
-    var version = (navigator.userAgent.match(/OS (\d+)[_.](\d+)/) || [])
-      .slice(1, 3).join('.');
-    var facts = [
-      standalone ? 'home screen' : 'Safari tab',
-      version ? 'iOS ' + version : navigator.platform,
+
+    /* Name the platform properly. Sharing behaves differently on iOS and
+       Android — canShare can say yes on both and only one of them actually
+       hands the file over — so a report that does not say which phone it came
+       from is close to useless. */
+    var platform;
+    var ios = agent.match(/OS (\d+)[_.](\d+)/);
+    var android = agent.match(/Android (\d+(?:\.\d+)?)/);
+    if (/iPhone|iPad|iPod/.test(agent)) {
+      platform = ios ? 'iOS ' + ios[1] + '.' + ios[2] : 'iOS';
+    } else if (android) {
+      platform = 'Android ' + android[1];
+    } else {
+      platform = navigator.platform || 'unknown';
+    }
+
+    var line = $('export-env');
+    line.textContent = [
+      standalone ? 'home screen' : 'browser tab',
+      platform,
       'share ' + (navigator.share ? 'yes' : 'no'),
       'canShare ' + (navigator.canShare ? 'yes' : 'no')
-    ];
-    var line = $('export-env');
-    line.textContent = facts.join(' · ');
+    ].join(' · ');
     line.classList.remove('hidden');
   }
 

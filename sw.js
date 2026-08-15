@@ -4,7 +4,7 @@
  * field connection is slow enough that a network-first check is felt on every
  * launch. Bump CACHE_VERSION to push an update to the phones. */
 
-var CACHE_VERSION = 'arrow-v4';
+var CACHE_VERSION = 'arrow-v5';
 
 /* Relative paths throughout, so the app works from a project subdirectory on
    GitHub Pages as well as from a domain root. */

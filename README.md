@@ -187,6 +187,19 @@ The share passes **the file and nothing else** — no title, no text. Adding
 either alongside a file is a documented way to make Safari reject the share, and
 the filename already travels with the file, so the title bought nothing.
 
+### Testing on Android
+
+The same code runs on Android, and most of it behaves identically — that is the
+point of building it this way. **Sharing is the exception.** The Web Share API
+is one of the genuinely divergent parts of the platform: `canShare()` can return
+true on both and only one of them will actually hand the file to WhatsApp, and
+Chrome and Safari disagree about which file types are allowed.
+
+A share failure on an Android test phone therefore says nothing about the
+iPhones this is built for. Confirm anything share-related on an actual iPhone
+before treating it as a bug. Everything else — capture, GPS, the overlay, the
+workbook, offline — is worth testing on whatever is to hand.
+
 ### If "Send to WhatsApp" fails
 
 The message now names what iOS reported, and a line underneath shows whether the
